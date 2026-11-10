@@ -1,0 +1,62 @@
+# .NET build artifacts
+**/bin/
+**/obj/
+**/out/
+**/publish/
+artifacts/
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+
+# Visual Studio / VS Code
+.vs/
+.vscode/*
+!.vscode/extensions.json
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Test results and coverage
+TestResults/
+**/TestResults/
+*.trx
+coverage/
+coverage.*
+*.coverage
+*.coveragexml
+
+# Logs
+*.log
+logs/
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+
+**/appsettings.Local.json
+**/appsettings.*.local.json
+**/appsettings.Development.json
+**/appsettings.Testing.json
+
+# Local database files and dumps
+*.db
+*.sqlite
+*.sqlite3
+*.dump
+*.backup
+*.sql.gz
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.swp
+*~

@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinguaContext", "LinguaContext\LinguaContext.csproj", "{AE102587-A73D-423E-A4D5-5985F39A5ADB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinguaContext.Tests", "LinguaContext.Tests\LinguaContext.Tests.csproj", "{B320CA99-6B3F-4D96-9305-0E0E1266DCAD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AE102587-A73D-423E-A4D5-5985F39A5ADB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE102587-A73D-423E-A4D5-5985F39A5ADB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE102587-A73D-423E-A4D5-5985F39A5ADB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE102587-A73D-423E-A4D5-5985F39A5ADB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B320CA99-6B3F-4D96-9305-0E0E1266DCAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B320CA99-6B3F-4D96-9305-0E0E1266DCAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B320CA99-6B3F-4D96-9305-0E0E1266DCAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B320CA99-6B3F-4D96-9305-0E0E1266DCAD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
