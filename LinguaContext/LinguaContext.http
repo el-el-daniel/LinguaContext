@@ -1,6 +1,3 @@
 @LinguaContext_HostAddress = http://localhost:5245
 
-GET {{LinguaContext_HostAddress}}/weatherforecast/
-Accept: application/json
-
 ###

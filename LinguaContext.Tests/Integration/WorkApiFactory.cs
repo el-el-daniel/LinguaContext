@@ -26,7 +26,8 @@ public sealed class WorkApiFactory : WebApplicationFactory<AppDbContext>, IAsync
             // Remove the original options callback too (EF Core 9+).
             services.RemoveAll<IDbContextOptionsConfiguration<AppDbContext>>();
             services.AddDbContext<AppDbContext>(options =>
-                options.UseNpgsql(_postgres.GetConnectionString()));
+                options.UseNpgsql(_postgres.GetConnectionString())
+                    .UseSnakeCaseNamingConvention());
         });
     }
 

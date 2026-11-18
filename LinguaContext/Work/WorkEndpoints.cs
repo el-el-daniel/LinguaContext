@@ -1,3 +1,4 @@
+using System.Text.Json;
 using LinguaContext.Common.Pagination;
 
 namespace LinguaContext.Work;
@@ -10,10 +11,14 @@ public static class WorkEndpoints
 
     private static ValidationProblem ToValidationProblem(ArgumentException e)
     {
+        var field = e.ParamName is { Length: > 0 }
+            ? JsonNamingPolicy.CamelCase.ConvertName(e.ParamName)
+            : "general";
+        
         return TypedResults.ValidationProblem(
             new Dictionary<string, string[]>
             {
-                [e.ParamName ?? "general"] = [e.Message]
+                [field] = [e.Message]
             });
     }
     
@@ -99,11 +104,19 @@ public static class WorkEndpoints
     private static async Task<
         Results<
             NoContent,
-            NotFound>> DeleteWorkAsync(int id, WorkService workService, CancellationToken cancellationToken)
+            NotFound,
+            ProblemHttpResult>> DeleteWorkAsync(int id, WorkService workService, CancellationToken cancellationToken)
     {
-        if (await workService.DeleteAsync(id, cancellationToken))
-            return TypedResults.NoContent();
-        return TypedResults.NotFound();
+        var result = await workService.DeleteAsync(id, cancellationToken);
+        
+        if (result is DeleteWorkError.WorkNotFound)
+            return TypedResults.NotFound();
+        if (result is DeleteWorkError.ExpressionsFound)
+            return TypedResults.Problem(
+                statusCode: StatusCodes.Status409Conflict,
+                title: "Work cannot be deleted",
+                detail: "This work has associated expressions.");
+        return TypedResults.NoContent();
     }
     
     public static RouteGroupBuilder MapWorkEndpoints(this IEndpointRouteBuilder app)
@@ -112,10 +125,14 @@ public static class WorkEndpoints
 
         workGroup.MapGet("/{id:int}", GetWorkByIdAsync)
             .WithName(GetByIdRouteName);
+        
         workGroup.MapGet("", GetWorksAsync);
         workGroup.MapPost("", CreateWorkAsync);
         workGroup.MapPatch("/{id:int}", UpdateWorkAsync);
-        workGroup.MapDelete("/{id:int}", DeleteWorkAsync);
+        
+        workGroup.MapDelete("/{id:int}", DeleteWorkAsync)
+            .WithName("DeleteWork")
+            .Produces(StatusCodes.Status409Conflict);
         
         return workGroup;
     }

@@ -1,6 +1,7 @@
 using LinguaContext.Common.Pagination;
 using LinguaContext.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 namespace LinguaContext.Work;
 
@@ -16,10 +17,10 @@ public class WorkService(AppDbContext dbContext)
             .Replace("_", "\\_");
     
     public async Task<WorkResponse> CreateAsync(
-        CreateWorkRequest createWorkRequest,
+        CreateWorkRequest request,
         CancellationToken cancellationToken = default)
     {
-        var work = new Work(createWorkRequest.Name, createWorkRequest.Type);
+        var work = new Work(request.Name, request.Type);
         dbContext.Works.Add(work);
         await dbContext.SaveChangesAsync(cancellationToken);
         
@@ -91,32 +92,63 @@ public class WorkService(AppDbContext dbContext)
 
     public async Task<WorkResponse?> UpdateAsync(
         int id,
-        UpdateWorkRequest updateWorkRequest,
+        UpdateWorkRequest request,
         CancellationToken cancellationToken = default)
     {
         var work = await dbContext.Works.FindAsync([id], cancellationToken);
         if (work is null)
             return null;
 
-        if (updateWorkRequest.Name is not null)
-            work.Rename(updateWorkRequest.Name);
+        if (request.Name is not null)
+            work.Rename(request.Name);
 
-        if (updateWorkRequest.Type is not null)
-            work.ChangeType(updateWorkRequest.Type.Value);
+        if (request.Type is not null)
+            work.ChangeType(request.Type.Value);
 
-        await dbContext.SaveChangesAsync(cancellationToken);
+        try
+        {
+            await dbContext.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            return null;
+        }
 
         return ToWorkResponse(work);
     }
 
-    public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<DeleteWorkError?> DeleteAsync(int id, CancellationToken cancellationToken = default)
     {
         var work = await dbContext.Works.FindAsync([id], cancellationToken);
         if (work is null)
-            return false;
-        
+            return DeleteWorkError.WorkNotFound;
+
+        var exists = await dbContext.Expressions
+            .AnyAsync(e => e.WorkId == id, cancellationToken);
+
+        if (exists)
+            return DeleteWorkError.ExpressionsFound;
+
         dbContext.Works.Remove(work);
-        await dbContext.SaveChangesAsync(cancellationToken);
-        return true;
+
+        try
+        {
+            await dbContext.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            return DeleteWorkError.WorkNotFound;
+        }
+        catch (DbUpdateException ex)
+            when (ex.InnerException is PostgresException
+                  {
+                      SqlState: PostgresErrorCodes.ForeignKeyViolation,
+                      ConstraintName: DbConstraints.ExpressionWorkForeignKey
+                  })
+        {
+            return DeleteWorkError.ExpressionsFound;
+        }
+        
+        return null;
     }
 }

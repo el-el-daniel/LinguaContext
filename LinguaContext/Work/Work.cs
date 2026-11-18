@@ -1,27 +1,21 @@
 namespace LinguaContext.Work;
 
-public class Work
+public class Work(string name, WorkType type)
 {
     public int Id { get; private set; }
-    public string Name { get; private set; }
-    public WorkType Type { get; private set; }
-
-    public Work(string name, WorkType type)
-    {
-        Name = ValidateAndNormalizeName(name);
-        Type = ValidateType(type);
-    }
+    public string Name { get; private set; } = ValidateAndNormalizeName(name);
+    public WorkType Type { get; private set; } = ValidateType(type);
 
     private static string ValidateAndNormalizeName(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
             throw new ArgumentException("Name is empty", nameof(name));
         
-        var nameTrimmed = name.Trim();
-        if (nameTrimmed.Length > 200)
-            throw new ArgumentException("Name is too long", nameof(name));
+        var normalizedName = name.Trim();
+        if (normalizedName.Length > 200)
+            throw new ArgumentException("Name must not exceed 200 characters", nameof(name));
         
-        return nameTrimmed;
+        return normalizedName;
     }
 
     private static WorkType ValidateType(WorkType type)

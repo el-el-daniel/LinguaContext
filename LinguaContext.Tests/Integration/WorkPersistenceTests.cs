@@ -19,6 +19,7 @@ public class WorkPersistenceTests
 
         var options = new DbContextOptionsBuilder<AppDbContext>()
             .UseNpgsql(postgres.GetConnectionString())
+            .UseSnakeCaseNamingConvention()
             .LogTo(
                 Console.WriteLine,
                 new[] { DbLoggerCategory.Database.Command.Name },
